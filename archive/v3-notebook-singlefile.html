@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Does your feed know why you clicked?</title>
+<meta name="description" content="Maya and Leo watched the same cooking videos for different reasons. A plain look at what recommendation feeds can and can’t know about you.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme:light;
+  --paper:#EFE6D4;
+  --paper-deep:#E6DBC1;
+  --ink:#262220;
+  --ink-soft:#544C42;
+  --pen:#22407F;
+  --red:#A23527;
+  --hl:#F3D04A;
+  --tape:#E1D2A9;
+  --tape-edge:rgba(150,131,88,.45);
+  --print:#D7D3C9;
+  --print-ink:#464440;
+  --hair:#B3A98F;
+  --rule:rgba(34,64,127,.14);
+}
+*,*::before,*::after{box-sizing:border-box}
+html{background:var(--paper);overflow-x:hidden;scroll-padding-top:12px}
+body{
+  margin:0;background:var(--paper);color:var(--ink);
+  font-family:'Source Serif 4',Georgia,'Times New Roman',serif;
+  font-size:17.5px;line-height:1.62;
+  -webkit-font-smoothing:antialiased;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+  -webkit-print-color-adjust:exact;print-color-adjust:exact;
+}
+img,svg{max-width:100%}
+a{color:var(--pen)}
+a:focus-visible,button:focus-visible{outline:2.5px solid var(--pen);outline-offset:3px}
+[hidden]{display:none !important}
+.vh{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;border:0}
+table.vh{table-layout:fixed}
+table.vh th,table.vh td,table.vh caption{width:1px;overflow:hidden}
+
+/* paper grain */
+.grain{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;opacity:.13;mix-blend-mode:multiply;z-index:40}
+
+/* ---------- type ---------- */
+h1,h2,h3{font-family:'Libre Baskerville',Georgia,serif;font-weight:700;margin:0;letter-spacing:-.012em}
+h1{font-size:clamp(30px,5.3vw,50px);line-height:1.14;margin-bottom:14px}
+h2{font-size:clamp(24px,3.5vw,35px);line-height:1.2;margin-bottom:14px}
+h3{font-size:clamp(19px,2vw,22px);line-height:1.3;margin-bottom:6px}
+p{margin:0 0 14px;max-width:63ch}
+.lede{font-size:clamp(18px,1.25rem,20px);line-height:1.58}
+.hand{font-family:'Caveat',"Segoe Script",cursive;font-weight:600;line-height:1.18;letter-spacing:.005em}
+.type{font-family:'Courier Prime',ui-monospace,'Courier New',monospace}
+.pen{color:var(--pen)}
+.redpen{color:var(--red)}
+.hl{position:relative;z-index:0}
+.hl::before,.hl::after{content:"";position:absolute;z-index:-1;background:var(--hl);mix-blend-mode:multiply;pointer-events:none}
+.hl::before{left:-.24em;right:-.3em;top:.06em;height:.82em;opacity:.55;transform:rotate(-.45deg);clip-path:polygon(2% 8%,99% 0%,100% 90%,0% 100%)}
+.hl::after{left:.08em;right:-.12em;top:.44em;height:.44em;opacity:.38;transform:rotate(.5deg);clip-path:polygon(0% 10%,100% 0%,98% 94%,1% 100%)}
+
+/* ---------- structure ---------- */
+.sheet{max-width:1000px;margin:0 auto;padding:0 clamp(18px,5vw,54px);position:relative}
+section,header,footer{position:relative}
+.band{padding:clamp(30px,5vw,54px) 0}
+
+/* tape */
+.tape{position:absolute;display:block;width:88px;height:25px;background:var(--tape);opacity:.88;
+  border-left:1px solid var(--tape-edge);border-right:1px solid var(--tape-edge);
+  clip-path:polygon(0% 6%,6% 0%,16% 7%,30% 1%,46% 8%,62% 2%,76% 9%,90% 3%,100% 10%,97% 95%,86% 100%,70% 93%,54% 100%,38% 92%,24% 99%,10% 93%,2% 100%);
+  pointer-events:none;z-index:3}
+
+/* ---------- hero ---------- */
+.hero{padding-top:clamp(22px,4vw,40px)}
+.kicker{font-size:15px;color:var(--ink-soft);margin:0 0 18px}
+.hero h1{max-width:17ch}
+.hero .lede{max-width:46ch;margin-bottom:20px}
+.switch{display:inline-flex;align-items:center;gap:11px;background:none;border:0;padding:6px 4px;margin:0 0 30px;cursor:pointer;
+  font-family:'Courier Prime',monospace;font-size:15px;color:var(--ink);text-align:left}
+.switch .box{width:26px;height:26px;flex:none;position:relative}
+.switch .box svg{display:block;width:26px;height:26px;overflow:visible}
+.switch .tick{opacity:0;transition:opacity .18s}
+.switch[aria-pressed="true"] .tick{opacity:1}
+.switch .switch-label{border-bottom:1.5px dotted var(--ink-soft);padding-bottom:1px}
+.switch:hover .switch-label{border-bottom-style:solid}
+
+.duo{display:grid;grid-template-columns:1fr auto 1fr;gap:clamp(12px,2.4vw,26px);align-items:start;margin-bottom:8px}
+.person{margin:0;position:relative}
+.person.m{transform:rotate(-1.1deg)}
+.person.l{transform:rotate(.9deg);margin-top:22px;justify-self:end}
+.midnote{justify-self:center}
+.snap{background:#F7F2E6;border:1px solid var(--hair);padding:9px 9px 6px;max-width:208px;position:relative}
+.snap svg{display:block;width:100%;height:auto;color:var(--pen)}
+.person .snap .tape{top:-13px}
+.person.m .snap .tape{left:14px;transform:rotate(-7deg)}
+.person.l .snap .tape{right:14px;left:auto;transform:rotate(6deg)}
+.cap-name{font-family:'Caveat',cursive;font-weight:700;font-size:30px;color:var(--pen);margin:4px 0 0;line-height:1}
+.ann{font-family:'Caveat',cursive;font-weight:600;font-size:23px;line-height:1.14;color:var(--pen);
+  margin:2px 0 14px;max-width:21ch;transform:rotate(-.8deg);transition:color .25s}
+.person.l .ann{transform:rotate(.7deg)}
+
+.screen{background:var(--print);border:1px solid var(--hair);padding:9px 10px 10px;max-width:234px;position:relative;transform:rotate(.8deg)}
+.person.l .screen{transform:rotate(-1.1deg)}
+.person .screen .tape{width:66px;height:21px;top:-10px;left:50%;right:auto;margin-left:-33px;transform:rotate(-2deg)}
+.scr-h{font-family:'Courier Prime',monospace;font-size:11.5px;letter-spacing:.02em;color:var(--print-ink);
+  margin:0 0 7px;padding-bottom:5px;border-bottom:1px solid #BFBAAF}
+.scr-list{list-style:none;margin:0;padding:0}
+.scr-list li{display:flex;gap:8px;align-items:center;padding:4px 0}
+.scr-list li + li{border-top:1px solid rgba(0,0,0,.07)}
+.th{width:44px;height:27px;flex:none;background:#B8B4AA;position:relative}
+.th::after{content:"";position:absolute;left:18px;top:8px;border-left:9px solid #D7D3C9;border-top:5.5px solid transparent;border-bottom:5.5px solid transparent}
+.tt{font-family:'Courier Prime',monospace;font-size:11.5px;line-height:1.26;color:var(--print-ink)}
+.tt em{display:block;font-style:normal;font-size:10.5px;color:#6E6A62}
+.midnote{align-self:center;text-align:center;width:clamp(96px,11vw,132px);margin-top:84px}
+.midnote .hand{font-size:25px;color:var(--pen);display:block;transform:rotate(-4deg)}
+.midnote svg{display:block;margin:2px auto 0;color:var(--pen)}
+.caprow{display:flex;gap:clamp(16px,4vw,52px);align-items:flex-start;flex-wrap:wrap;margin-top:22px}
+.hero-cap{font-size:17px;max-width:46ch;margin:0;color:var(--ink-soft)}
+.cap-note{font-family:'Caveat',cursive;font-weight:700;font-size:25px;color:var(--pen);transform:rotate(-1.6deg);flex:0 1 auto;margin-top:2px}
+
+/* feed's view */
+.feed-view .ann{font-family:'Courier Prime',monospace;font-size:13px;font-weight:400;color:var(--print-ink);
+  transform:none;letter-spacing:.01em;max-width:26ch}
+.feed-view .cap-name{color:var(--print-ink);font-family:'Courier Prime',monospace;font-size:13px;font-weight:700;letter-spacing:.04em}
+.feed-view .snap{background:var(--print)}
+.feed-view .snap svg{color:#8B857A;--hl:#C9C4B8}
+.feed-view .midnote{opacity:.12}
+.feed-view ~ .caprow .cap-note{opacity:.12}
+.feed-view .person{transform:none}
+.feed-view .screen{transform:none}
+
+/* ---------- ruled notes section ---------- */
+.ruled{background:var(--paper);
+  background-image:repeating-linear-gradient(to bottom,transparent 0 31px,var(--rule) 31px 32px);
+  background-position:0 10px;border-top:1px solid rgba(0,0,0,.09);border-bottom:1px solid rgba(0,0,0,.09)}
+.ruled > .sheet{padding-left:clamp(28px,5vw,54px)}
+.ruled > .sheet::before{content:"";position:absolute;left:clamp(9px,2vw,26px);top:-34px;bottom:-34px;width:1px;background:rgba(162,53,39,.42)}
+.clue{padding:4px 0 2px;max-width:900px}
+.clue + .clue{margin-top:30px;padding-top:26px;border-top:1px dashed rgba(0,0,0,.22)}
+.clue.b{margin-left:auto;max-width:880px}
+.clue-grid{display:grid;grid-template-columns:1fr 330px;gap:26px;align-items:start}
+.clue.b .clue-grid{grid-template-columns:330px 1fr}
+.clue.b .clue-words{order:2}
+.clue.b .strip{order:1}
+.clue h3{margin-bottom:4px}
+.clue-tag{font-family:'Courier Prime',monospace;font-size:12.5px;color:var(--print-ink);
+  background:var(--print);border:1px solid var(--hair);padding:2px 8px;display:inline-block;margin-bottom:9px}
+.clue p{font-size:17.5px;margin-bottom:0}
+.strip{background:var(--print);border:1px solid var(--hair);padding:12px 12px 4px;position:relative;transform:rotate(-.5deg)}
+.clue.b .strip{transform:rotate(.6deg)}
+.strip .tape{width:60px;height:20px;top:-9px;right:14px;transform:rotate(5deg)}
+.srow{display:flex;align-items:center;gap:5px;margin-bottom:24px}
+.srow:last-of-type{margin-bottom:14px}
+.who{font-family:'Courier Prime',monospace;font-size:11.5px;width:40px;flex:none;color:var(--print-ink)}
+.cell{width:38px;height:24px;flex:none;background:#B8B4AA;position:relative}
+.cell::after{content:"";position:absolute;left:15px;top:7px;border-left:8px solid #D7D3C9;border-top:5px solid transparent;border-bottom:5px solid transparent}
+.cell.q{background:none;border:1px dashed #8C877C}
+.cell.q::after{border-left-color:#8C877C;left:14px}
+.cell span{position:absolute;left:0;top:27px;font-family:'Courier Prime',monospace;font-size:10px;color:#6E6A62;white-space:nowrap}
+.srow .lab{width:46px}
+.gapmark{width:52px;flex:none;text-align:center;font-family:'Courier Prime',monospace;font-size:9.5px;line-height:1.2;color:#6E6A62}
+.gapmark::after{content:"";display:block;height:1px;margin:4px 4px 0;background:repeating-linear-gradient(to right,#8C877C 0 5px,transparent 5px 9px)}
+.verdict{font-family:'Caveat',cursive;font-weight:700;font-size:25px;color:var(--pen);margin:16px 0 0;transform:rotate(-1deg)}
+.disclaim{font-size:15.5px;color:var(--ink-soft);margin-top:26px;max-width:62ch}
+
+/* ---------- results ---------- */
+.results .lede{max-width:60ch}
+.resgrid{display:grid;grid-template-columns:1.25fr 1fr;gap:clamp(22px,4vw,48px);align-items:start;margin-top:26px}
+.chart{margin:0}
+.chart figcaption{margin-bottom:6px}
+.chart-title{display:block;font-family:'Libre Baskerville',Georgia,serif;font-weight:700;font-size:17px;line-height:1.3}
+.chart-sub{display:block;font-family:'Courier Prime',monospace;font-size:12.5px;color:var(--ink-soft);margin-top:3px}
+.canvas{width:100%}
+.canvas svg{display:block;overflow:visible}
+.sk text.lbl{font-family:'Courier Prime',monospace;font-size:13px;fill:var(--print-ink)}
+.sk text.hw{font-family:'Caveat',cursive;font-weight:700;font-size:27px;fill:var(--pen)}
+.sk text.rw{font-family:'Caveat',cursive;font-weight:700;font-size:23px;fill:var(--red)}
+.score{font-family:'Caveat',cursive;font-weight:700;font-size:clamp(42px,6vw,60px);line-height:.98;color:var(--ink);margin:0 0 8px;transform:rotate(-1.4deg)}
+.wcap{font-family:'Courier Prime',monospace;font-size:12.5px;color:var(--ink-soft);margin:10px 0 0}
+
+/* ---------- takeaway ---------- */
+.takeaway h2{max-width:20ch}
+.sunday{display:flex;flex-wrap:wrap;gap:clamp(20px,4vw,46px);margin-top:30px;align-items:flex-start}
+.note{background:#F7F2E6;border:1px solid var(--hair);padding:14px 16px 16px;position:relative;max-width:300px;flex:1 1 250px}
+.note:first-child{transform:rotate(-1.3deg)}
+.note:last-child{transform:rotate(1.1deg);margin-top:26px;margin-left:clamp(0px,5vw,90px)}
+.note .tape{width:72px;height:22px;top:-11px;left:22px;transform:rotate(-6deg)}
+.note:last-child .tape{left:auto;right:20px;transform:rotate(7deg)}
+.note .day{font-family:'Caveat',cursive;font-weight:700;font-size:26px;color:var(--pen);display:block;line-height:1;margin-bottom:5px}
+.note p{font-size:17px;margin:0}
+.note svg{display:block;width:70px;height:auto;color:var(--pen);float:right;margin:0 0 4px 10px}
+
+/* ---------- why it matters ---------- */
+.why-wrap{position:relative;margin-top:44px}
+.torn{display:block;width:100%;height:16px;position:relative;z-index:2;margin-bottom:-1px;color:var(--paper-deep)}
+.why{background:var(--paper-deep);padding:4px 0 clamp(26px,4vw,38px)}
+.why .tape{width:96px;height:26px;top:-14px;left:12%;transform:rotate(-5deg);z-index:4}
+.why h3{font-size:clamp(21px,2.4vw,26px);margin-bottom:10px}
+.why p{max-width:58ch}
+.phases{font-family:'Caveat',cursive;font-weight:600;font-size:25px;color:var(--pen);line-height:1.45;margin:4px 0 16px;max-width:30ch}
+.phases span{display:block}
+.phases span:nth-child(1){transform:rotate(-.8deg) translateX(4px)}
+.phases span:nth-child(2){transform:rotate(.5deg) translateX(16px)}
+.phases span:nth-child(3){transform:rotate(-.4deg) translateX(9px)}
+.ni-wrap{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:18px 0 12px}
+.ni{display:block;width:190px;height:46px;color:var(--ink)}
+.ni-note{font-family:'Caveat',cursive;font-weight:600;font-size:23px;color:var(--pen);transform:rotate(-1.4deg)}
+
+/* ---------- footer ---------- */
+.foot{background:var(--paper-deep);padding:6px 0 30px}
+.foot .torn{color:var(--paper-deep)}
+.footnav{display:flex;flex-wrap:wrap;gap:10px 26px;margin:14px 0 20px;padding:0;list-style:none}
+.footnav a{font-family:'Courier Prime',monospace;font-size:15px;color:var(--pen);text-decoration:none;border-bottom:1.5px solid var(--pen);padding-bottom:2px}
+.footnav a:hover{border-bottom-width:3px}
+.foot p{font-size:14.5px;line-height:1.55;color:var(--ink-soft);max-width:78ch;margin:0 0 8px}
+.foot b{color:var(--ink)}
+
+/* ---------- notes pages ---------- */
+.back{font-family:'Caveat',cursive;font-weight:700;font-size:24px;color:var(--pen);text-decoration:none;display:inline-block;margin-bottom:14px}
+.back:hover{text-decoration:underline}
+.page-head{padding:clamp(22px,4vw,40px) 0 4px}
+#view-sources .band,#view-ai-use .band{padding-top:clamp(14px,2vw,22px)}
+.page-head p{font-size:17.5px;color:var(--ink-soft);max-width:56ch}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:26px 44px;margin-top:10px}
+.cols h3{font-size:19px;margin-bottom:4px}
+.cols p{font-size:17px;margin:0}
+.cite{background:var(--paper-deep);border:1px solid var(--hair);padding:16px 18px;margin-top:30px;position:relative;transform:rotate(-.35deg)}
+.cite .tape{width:80px;height:23px;top:-12px;right:26px;transform:rotate(5deg)}
+.cite p{font-size:16px;margin:0 0 8px;max-width:76ch}
+.cite p:last-child{margin-bottom:0}
+.rows{margin-top:16px}
+.rowi{display:grid;grid-template-columns:170px 1fr;gap:10px 30px;padding:16px 0;border-top:1px solid rgba(0,0,0,.18)}
+.rows .rowi:last-of-type{border-bottom:1px solid rgba(0,0,0,.18)}
+.rowi h3{font-family:'Courier Prime',monospace;font-size:14px;font-weight:700;letter-spacing:.03em;margin:3px 0 0;color:var(--print-ink)}
+.rowi p{font-size:17px;margin:0 0 10px}
+.rowi p:last-child{margin-bottom:0}
+.fine{font-size:14.5px;color:var(--ink-soft);margin-top:18px}
+
+/* ---------- responsive ---------- */
+@media (max-width:860px){
+  .clue-grid,.clue.b .clue-grid{grid-template-columns:1fr;gap:16px}
+  .clue.b .clue-words{order:1}
+  .clue.b .strip{order:2}
+  .resgrid{grid-template-columns:1fr;gap:34px}
+  .cols{grid-template-columns:1fr;gap:20px}
+  .rowi{grid-template-columns:1fr;gap:4px}
+}
+@media (max-width:720px){
+  .duo{grid-template-columns:1fr;gap:26px;justify-items:start}
+  .person.l{margin-top:0}
+  .midnote{margin:4px 0 0 8px;width:auto;justify-self:start;text-align:left}
+  .midnote svg{margin:0 0 0 30px}
+  .snap{max-width:186px}
+  .screen{max-width:100%;width:min(300px,100%)}
+  .note:last-child{margin-top:8px}
+  .why .tape{left:8%}
+}
+@media (max-width:420px){
+  .srow{gap:3px}
+  .cell{width:32px;height:21px}
+  .cell::after{left:12px}
+  .who{width:36px;font-size:11px}
+  .gapmark{width:44px}
+}
+@media (prefers-reduced-motion:reduce){
+  *{transition:none !important;animation:none !important}
+}
+</style>
+</head>
+<body>
+
+<svg class="grain" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+  <filter id="grainF"><feTurbulence type="fractalNoise" baseFrequency="0.86" numOctaves="4" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter>
+  <rect width="100%" height="100%" filter="url(#grainF)"/>
+</svg>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
+  <filter id="rough" x="-25%" y="-25%" width="150%" height="150%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.038" numOctaves="3" seed="9" result="n"/>
+    <feDisplacementMap in="SourceGraphic" in2="n" scale="3.4" xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
+  <filter id="rough2" x="-25%" y="-25%" width="150%" height="150%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.042" numOctaves="3" seed="23" result="n2"/>
+    <feDisplacementMap in="SourceGraphic" in2="n2" scale="3.1" xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
+
+  <symbol id="fig-maya" viewBox="0 0 150 184">
+    <g filter="url(#rough)" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M41 184 C41 136 55 115 75 115 C95 115 109 136 109 184 Z" fill="var(--hl)" fill-opacity=".34" stroke="none"/>
+      <path d="M41 184 C41 136 55 115 75 115 C95 115 109 136 109 184"/>
+      <path d="M61 119 C59 142 58 163 59 184"/>
+      <path d="M89 119 C91 142 92 163 91 184"/>
+      <path d="M62 136 L89 136 L91 158 L60 158 Z"/>
+      <path d="M66 116 L72 104 M84 116 L78 104"/>
+      <path d="M68 97 L68 114 M83 97 L83 114"/>
+      <ellipse cx="75" cy="68" rx="28" ry="32"/>
+      <path d="M47 66 C44 35 59 24 75 24 C92 24 106 35 103 66 C98 52 90 45 77 44 C66 46 53 52 47 66"/>
+      <path d="M47 66 C41 82 43 94 45 100 M103 66 C109 82 107 94 105 100"/>
+      <path d="M59 58 Q65 54 71 58 M80 58 Q86 54 92 58"/>
+      <circle cx="65" cy="68" r="2.5" fill="currentColor"/>
+      <circle cx="86" cy="68" r="2.5" fill="currentColor"/>
+      <path d="M75 71 C72 77 74 80 77 80"/>
+      <path d="M66 86 Q75 94 85 85"/>
+      <path d="M47 127 C33 134 28 148 32 160"/>
+      <path d="M103 127 C117 133 123 144 121 154"/>
+      <path d="M121 152 L134 116"/>
+      <ellipse cx="136" cy="108" rx="7" ry="10" transform="rotate(12 136 108)"/>
+      <path d="M50 150 L56 162 M54 148 L60 160"/>
+    </g>
+  </symbol>
+
+  <symbol id="fig-leo" viewBox="0 0 150 184">
+    <g filter="url(#rough2)" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M40 184 C42 137 56 115 75 115 C94 115 108 137 110 184"/>
+      <path d="M65 117 L75 133 L85 117"/>
+      <path d="M68 97 L68 114 M83 97 L83 114"/>
+      <ellipse cx="75" cy="68" rx="28" ry="32"/>
+      <path d="M48 62 C44 36 58 22 75 22 C92 22 106 36 102 62"/>
+      <path d="M52 48 a9 9 0 1 1 15 -7 M67 36 a9 9 0 1 1 17 -2 M84 33 a9 9 0 1 1 15 10 M49 58 a7 7 0 1 1 11 -5"/>
+      <circle cx="64" cy="69" r="10"/>
+      <circle cx="88" cy="69" r="10"/>
+      <path d="M74 68 L78 68"/>
+      <path d="M54 66 L46 63 M98 66 L105 62"/>
+      <circle cx="64" cy="69" r="2.4" fill="currentColor"/>
+      <circle cx="88" cy="69" r="2.4" fill="currentColor"/>
+      <path d="M67 87 Q76 93 85 86"/>
+      <path d="M41 128 C30 136 26 149 30 159"/>
+      <path d="M109 128 C120 135 122 146 117 152"/>
+      <path d="M60 150 L64 164"/>
+    </g>
+    <g transform="rotate(-8 113 146)">
+      <rect x="86" y="132" width="56" height="30" fill="#F2EEE1" stroke="#6B6459" stroke-width="1.5"/>
+      <text x="114" y="145" text-anchor="middle" font-family="'Courier Prime',monospace" font-size="9" fill="#464440">DINNER</text>
+      <text x="114" y="156" text-anchor="middle" font-family="'Courier Prime',monospace" font-size="9" fill="#464440">SAT 7PM</text>
+    </g>
+  </symbol>
+
+  <symbol id="arrow-down" viewBox="0 0 40 72">
+    <g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 4 C14 18 25 30 18 44 C15 52 18 58 19 65"/>
+      <path d="M12 55 C15 60 18 64 19 67 C21 62 24 58 28 54"/>
+    </g>
+  </symbol>
+</defs></svg>
+
+<div class="view" id="view-home">
+
+<header class="hero band">
+  <div class="sheet">
+    <p class="kicker type">An ENGW 3302 explainer, written for college students who use feeds every day.</p>
+    <h1>Does your feed know <span class="hl">why</span> you clicked?</h1>
+    <p class="lede">Maya and Leo watched the same three cooking videos this week. They wanted two completely different things out of them, and their feeds have no way to tell.</p>
+
+    <button class="switch" type="button" id="feedSwitch" aria-pressed="false">
+      <span class="box" aria-hidden="true">
+        <svg viewBox="0 0 26 26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3.5 3 C9 2.2 17 2.6 23 3.4 C23.4 9 23.2 17 22.6 22.7 C16 23.4 9 23.2 3.2 22.5 C2.6 17 2.7 9 3.5 3 Z"/>
+          <path class="tick" d="M6 13.5 C9 16 10.5 18.6 11.6 20.8 C14 14.6 17.6 8.4 21.6 4.2" stroke="var(--pen)" stroke-width="2.6"/>
+        </svg>
+      </span>
+      <span class="switch-label">Show me the feed’s view</span>
+    </button>
+
+    <div class="duo" id="duo">
+      <figure class="person m">
+        <div class="snap">
+          <span class="tape" aria-hidden="true"></span>
+          <svg viewBox="0 0 150 184" role="img" aria-label="Pen drawing of Maya in an apron, holding a wooden spoon"><use href="#fig-maya" width="150" height="184"/></svg>
+        </div>
+        <figcaption class="cap-name">Maya</figcaption>
+        <p class="ann" data-real="learning to cook. wants new recipes every week" data-feed="watched 3 cooking videos.">learning to cook. wants new recipes every week</p>
+        <div class="screen" role="img" aria-label="Phone screenshot. Watched this week: Knife skills for beginners, 9 minutes. One-pan lemon chicken, 12 minutes. Fluffy rice every time, 6 minutes.">
+          <span class="tape" aria-hidden="true"></span>
+          <p class="scr-h">watched this week</p>
+          <ul class="scr-list">
+            <li><span class="th"></span><span class="tt">Knife skills for beginners<em>9 min</em></span></li>
+            <li><span class="th"></span><span class="tt">One-pan lemon chicken<em>12 min</em></span></li>
+            <li><span class="th"></span><span class="tt">Fluffy rice, every time<em>6 min</em></span></li>
+          </ul>
+        </div>
+      </figure>
+
+      <div class="midnote" aria-hidden="true">
+        <span class="hand">same 3 videos!!</span>
+        <svg viewBox="0 0 40 72" width="30" height="54"><use href="#arrow-down" width="40" height="72"/></svg>
+      </div>
+
+      <figure class="person l">
+        <div class="snap">
+          <span class="tape" aria-hidden="true"></span>
+          <svg viewBox="0 0 150 184" role="img" aria-label="Pen drawing of Leo holding a printed dinner party invitation for Saturday at 7pm"><use href="#fig-leo" width="150" height="184"/></svg>
+        </div>
+        <figcaption class="cap-name">Leo</figcaption>
+        <p class="ann" data-real="just needs one good dish for Saturday’s dinner party" data-feed="watched 3 cooking videos.">just needs one good dish for Saturday’s dinner party</p>
+        <div class="screen" role="img" aria-label="Phone screenshot. Watched this week: Knife skills for beginners, 9 minutes. One-pan lemon chicken, 12 minutes. Fluffy rice every time, 6 minutes.">
+          <span class="tape" aria-hidden="true"></span>
+          <p class="scr-h">watched this week</p>
+          <ul class="scr-list">
+            <li><span class="th"></span><span class="tt">Knife skills for beginners<em>9 min</em></span></li>
+            <li><span class="th"></span><span class="tt">One-pan lemon chicken<em>12 min</em></span></li>
+            <li><span class="th"></span><span class="tt">Fluffy rice, every time<em>6 min</em></span></li>
+          </ul>
+        </div>
+      </figure>
+    </div>
+
+    <div class="caprow">
+      <p class="hero-cap" id="heroCap" aria-live="polite" data-real="The two screens match. Everything in blue pen is the part your feed never gets to see." data-feed="This is the whole file: two identical histories, and no reason behind either one.">The two screens match. Everything in blue pen is the part your feed never gets to see.</p>
+      <span class="cap-note" aria-hidden="true">← this is the whole point</span>
+    </div>
+  </div>
+</header>
+
+<section class="band ruled">
+  <div class="sheet">
+    <h2>Would more history help it tell them apart?</h2>
+    <p>Feeds work from two kinds of clues. Here is what each one would pick up on Maya and Leo.</p>
+
+    <div class="clue a">
+      <div class="clue-grid">
+        <div class="clue-words">
+          <span class="clue-tag">clue type 1</span>
+          <h3>What you watch in one sitting</h3>
+          <p>Both of them opened the same videos in the same order, so this clue hands the feed one history and it makes one guess for both of them.</p>
+          <p class="verdict">same history → same guess</p>
+        </div>
+        <div class="strip" role="img" aria-label="Diagram: Maya and Leo each watched the same three videos, and the feed guesses meal prep next for both of them.">
+          <span class="tape" aria-hidden="true"></span>
+          <div class="srow"><span class="who">Maya</span><span class="cell"></span><span class="cell"></span><span class="cell"></span><span class="gapmark">next?</span><span class="cell q"><span>meal prep</span></span></div>
+          <div class="srow"><span class="who">Leo</span><span class="cell"></span><span class="cell"></span><span class="cell"></span><span class="gapmark">next?</span><span class="cell q"><span>meal prep</span></span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="clue b">
+      <div class="clue-grid">
+        <div class="clue-words">
+          <span class="clue-tag">clue type 2</span>
+          <h3>What you come back for later</h3>
+          <p>A week on, Maya looks up bread and Leo doesn’t. Their feeds finally split, but only after Saturday has already come and gone, and even then the feed can see what they did, never why they did it.</p>
+          <p class="verdict">different now, still no “why”</p>
+        </div>
+        <div class="strip" role="img" aria-label="Diagram: a week later, Maya watches a bread video and Leo watches basketball highlights.">
+          <span class="tape" aria-hidden="true"></span>
+          <div class="srow"><span class="who">Maya</span><span class="cell"></span><span class="cell"></span><span class="cell"></span><span class="gapmark">a week later</span><span class="cell"><span>bread</span></span></div>
+          <div class="srow"><span class="who">Leo</span><span class="cell"></span><span class="cell"></span><span class="cell"></span><span class="gapmark">a week later</span><span class="cell"><span>basketball</span></span></div>
+        </div>
+      </div>
+    </div>
+
+    <p class="disclaim">Maya and Leo are made up, to show the idea. None of this is data from a real app.</p>
+  </div>
+</section>
+
+<section class="band results">
+  <div class="sheet">
+    <h2>So how often do those clues guess right?</h2>
+    <p class="lede">A peer-reviewed study from 2022 tried both kinds of clues, and the two together, on the reading records of an Italian-language news site. For every click, each method made one guess at the next article the reader would open.</p>
+
+    <div class="resgrid">
+      <figure class="chart">
+        <figcaption>
+          <span class="chart-title">Share of guesses that matched the next click</span>
+          <span class="chart-sub">Italian-language news site, Table 5 of the study</span>
+        </figcaption>
+        <div class="canvas" id="barCanvas" role="img" aria-label="Hand-drawn bar chart of three results. Clues from this visit: 6.54 percent. Clues across visits: 1.28 percent. Both combined, circled in red pen as the best of the three: 11.40 percent."></div>
+        <table class="vh">
+          <caption>Share of one-article guesses that matched the reader’s next click</caption>
+          <thead><tr><th scope="col">Method</th><th scope="col">Share matched</th></tr></thead>
+          <tbody id="barData">
+            <tr data-w="6.54"><th scope="row">Clues from this visit</th><td>6.54%</td></tr>
+            <tr data-w="1.28"><th scope="row">Clues across visits</th><td>1.28%</td></tr>
+            <tr data-w="11.40" data-best="1"><th scope="row">Both combined</th><td>11.40%</td></tr>
+          </tbody>
+        </table>
+      </figure>
+
+      <div class="waffle">
+        <p class="score">11 right,<br>89 missed</p>
+        <div class="canvas" id="dotCanvas" role="img" aria-label="A hand-drawn grid of 100 circles with 11 scribbled in: out of every 100 guesses the best method made, about 11 matched and 89 did not."></div>
+        <p class="wcap">the best of the three, per 100 guesses</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="band takeaway">
+  <div class="sheet">
+    <h2>A good guess isn’t the same as knowing why</h2>
+    <p class="lede">The study checked one thing: did the guess match the next click. It never asked anyone why they clicked. Your feed has to guess that part too, and it never finds out when it gets it wrong.</p>
+
+    <div class="sunday">
+      <div class="note">
+        <span class="tape" aria-hidden="true"></span>
+        <svg viewBox="0 0 150 184" role="img" aria-label="Small pen drawing of Maya"><use href="#fig-maya" width="150" height="184"/></svg>
+        <span class="day">Sunday</span>
+        <p>Maya is picking out next week’s recipes. Her feed got her right.</p>
+      </div>
+      <div class="note">
+        <span class="tape" aria-hidden="true"></span>
+        <svg viewBox="0 0 150 184" role="img" aria-label="Small pen drawing of Leo"><use href="#fig-leo" width="150" height="184"/></svg>
+        <span class="day">Sunday</span>
+        <p>Leo’s party is over. His feed is still all recipes.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="why-wrap">
+    <svg class="torn" viewBox="0 0 1200 16" preserveAspectRatio="none" aria-hidden="true" focusable="false"><path fill="currentColor" d="M0,16 H1200 V6 L1176,11 L1150,4 L1128,12 L1100,5 L1075,13 L1050,6 L1020,11 L995,3 L968,10 L940,5 L915,12 L888,6 L860,11 L834,4 L806,10 L778,5 L750,12 L722,6 L695,11 L668,4 L640,10 L612,5 L585,12 L558,6 L530,11 L502,4 L475,10 L448,5 L420,12 L392,6 L365,11 L338,4 L310,10 L282,5 L255,12 L228,6 L200,11 L172,4 L145,10 L118,5 L90,12 L62,6 L35,11 L0,5 Z"/></svg>
+    <div class="why">
+      <span class="tape" aria-hidden="true"></span>
+      <div class="sheet">
+        <h3>Why this matters for you</h3>
+        <p>Your feed can’t tell a phase from a passion. All of these look the same from the outside:</p>
+        <p class="phases"><span>three videos for one exam</span><span>shopping for someone else’s gift</span><span>a week of breakup songs</span></p>
+        <p>So when something was only a phase, it helps to say so out loud. Many apps have a <span class="hl">“Not interested”</span> option tucked into the menu on a post, and it tells your feed something your clicks can’t.</p>
+        <div class="ni-wrap">
+          <svg class="ni" viewBox="0 0 190 46" aria-hidden="true" focusable="false">
+            <path d="M5 7 C56 3.6 126 4.4 183 6.8 C184.4 18 184 32 182.6 40.4 C124 42.8 59 42.4 6.4 39.6 C4.6 30 4.2 16 5 7 Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
+            <circle cx="28" cy="23" r="9" fill="none" stroke="currentColor" stroke-width="1.7"/>
+            <path d="M21.5 29.5 L34.5 16.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+            <text x="48" y="28" font-family="'Courier Prime',monospace" font-size="14" fill="currentColor">Not interested</text>
+          </svg>
+          <span class="ni-note">worth the two seconds</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="foot">
+  <svg class="torn" viewBox="0 0 1200 16" preserveAspectRatio="none" aria-hidden="true" focusable="false"><path fill="currentColor" d="M0,16 H1200 V7 L1172,3 L1148,11 L1120,5 L1094,12 L1066,4 L1038,10 L1010,5 L984,12 L956,6 L928,11 L900,4 L872,10 L846,5 L818,12 L790,6 L762,11 L734,4 L706,10 L678,5 L650,12 L622,6 L594,11 L566,4 L538,10 L510,5 L482,12 L454,6 L426,11 L398,4 L370,10 L342,5 L314,12 L286,6 L258,11 L230,4 L202,10 L174,5 L146,12 L118,6 L90,11 L62,4 L34,10 L0,6 Z"/></svg>
+  <div class="sheet">
+    <ul class="footnav">
+      <li><a href="#sources">Where the numbers come from</a></li>
+      <li><a href="#ai-use">How AI was used</a></li>
+    </ul>
+    <p><b>Source:</b> Symeonidis, Chaltsev, Berbague and Zanker, <i>Information Retrieval Journal</i>, 2022, Table 5. <a href="https://doi.org/10.1007/s10791-022-09415-w">Read the study</a>. The results come from one news website, and they are not a test of any social media or video app.</p>
+    <p><b>Images:</b> the drawings, phone screens and charts were made with AI (Claude). Maya, Leo and the video titles are invented. Made by Kevin for ENGW 3302.</p>
+  </div>
+</footer>
+</div>
+
+<div class="view" id="view-sources" hidden>
+  <header class="page-head">
+    <div class="sheet">
+      <a class="back" href="#home">← back to the main page</a>
+      <h1>Where the numbers come from</h1>
+      <p>For anyone who wants to check the main page, or doesn’t quite trust it yet.</p>
+    </div>
+  </header>
+  <main class="band">
+    <div class="sheet">
+      <div class="cols">
+        <div><h3>The study</h3><p>Four researchers published it in 2022 in the <i>Information Retrieval Journal</i>, which is peer reviewed, so other experts checked the work before it was published. They used reading records from three news websites. The main page uses one of them, an Italian-language site.</p></div>
+        <div><h3>What they measured</h3><p>For each click, a method guessed the one article the reader would open next, and the guess only counted if it matched. “Clues from this visit” and “clues across visits” are plain names for what the study calls intra-session and inter-session information. “Both combined” weighs the two equally.</p></div>
+        <div><h3>How to read the chart</h3><p>11.40% works out to about 11 right guesses per 100. A news site holds a lot of articles, so landing one guess is genuinely hard, and the study doesn’t claim the methods are bad. Even the best one was predicting what people would click, not learning why.</p></div>
+        <div><h3>What it can’t tell us</h3><p>Whether readers liked the suggestions, why anyone clicked, or how any social media or video app works. It only checked guesses against the next click, on news websites.</p></div>
+      </div>
+
+      <div class="cite">
+        <span class="tape" aria-hidden="true"></span>
+        <p><b>Full citation:</b> P. Symeonidis, D. Chaltsev, C. Berbague and M. Zanker, “Sequence-aware news recommendations by combining intra- with inter-session user information,” <i>Information Retrieval Journal</i>, vol. 25, pp. 461–480, 2022. Chart values from Table 5.</p>
+        <p>Read it at <a href="https://doi.org/10.1007/s10791-022-09415-w">doi.org/10.1007/s10791-022-09415-w</a>. The publisher may ask you to log in, and many university libraries give students free access.</p>
+      </div>
+
+      <div class="cite">
+        <p><b>About the images:</b> the drawings of Maya and Leo, the phone screens, the clue diagrams and both charts were made with AI (Claude) for this site. Maya, Leo and every video title are invented. There are no photos of real people. <a href="#ai-use">See how AI was used</a>.</p>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div class="view" id="view-ai-use" hidden>
+  <header class="page-head">
+    <div class="sheet">
+      <a class="back" href="#home">← back to the main page</a>
+      <h1>How AI was used</h1>
+      <p>This project used AI heavily. Here is exactly what it did and what came from me, so you can judge the work with that in mind.</p>
+    </div>
+  </header>
+  <main class="band">
+    <div class="sheet">
+      <div class="rows">
+        <div class="rowi"><h3>TOOL</h3><div><p>Claude, made by Anthropic, used two ways: through claude.ai (model: Claude Opus 5.5) in November 2026, and through Claude Code (model: Claude Opus 5) for the most recent pass.</p></div></div>
+        <div class="rowi"><h3>WHAT CLAUDE MADE</h3><div><p>This website and its two notes pages: the layout, colors and typefaces, the drawings of Maya and Leo, the phone screens, the clue diagrams, both charts, the feed-view switch and most of the wording.</p><p>I asked Claude to rebuild my draft to follow the assignment guidelines and the feedback from my instructor and two peer reviewers, then to redesign it in a bolder style, and finally to turn it into a website.</p><p>The latest redesign, the hand-drawn notebook look and the current wording were made with Claude Code, working from the same material and my directions about the style I wanted.</p></div></div>
+        <div class="rowi"><h3>WHAT CAME FROM ME</h3><div><p>The research from my Project 2 work: choosing this study, picking the finding to focus on, and pulling the results out of its Table 5. The target audience, college students, and the message that predicting a click is not the same as knowing why someone clicked. My earlier draft, which Claude revised. The art direction for this version.</p></div></div>
+        <div class="rowi"><h3>ACCURACY</h3><div><p>All three percentages come from Table 5 of the study. As the author, I am responsible for every claim and number here matching the source.</p></div></div>
+      </div>
+      <p class="fine">This page was also drafted by Claude.</p>
+    </div>
+  </main>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  var NS = 'http://www.w3.org/2000/svg';
+
+  /* ---------- hash routing: #home (default), #sources, #ai-use ---------- */
+  var views = { home: 'view-home', sources: 'view-sources', 'ai-use': 'view-ai-use' };
+  var titles = {
+    home: 'Does your feed know why you clicked?',
+    sources: 'Where the numbers come from',
+    'ai-use': 'How AI was used'
+  };
+  function show() {
+    var name = (location.hash || '').replace('#', '');
+    if (!views[name]) name = 'home';
+    Object.keys(views).forEach(function (k) {
+      var el = document.getElementById(views[k]);
+      if (el) el.hidden = (k !== name);
+    });
+    document.title = titles[name];
+    window.scrollTo(0, 0);
+    if (name === 'home') draw();
+  }
+
+  /* ---------- the feed's-view switch ---------- */
+  var sw = document.getElementById('feedSwitch');
+  var duo = document.getElementById('duo');
+  if (sw && duo) {
+    var label = sw.querySelector('.switch-label');
+    var swap = document.querySelectorAll('#view-home [data-real]');
+    sw.addEventListener('click', function () {
+      var on = sw.getAttribute('aria-pressed') !== 'true';
+      sw.setAttribute('aria-pressed', on ? 'true' : 'false');
+      duo.classList.toggle('feed-view', on);
+      label.textContent = on ? 'Show me the reasons again' : 'Show me the feed’s view';
+      Array.prototype.forEach.call(swap, function (el) {
+        el.textContent = el.getAttribute(on ? 'data-feed' : 'data-real');
+      });
+    });
+  }
+
+  /* ---------- a small hand-drawing kit (seeded, so it renders the same twice) ---------- */
+  function seeded(seed) {
+    return function () {
+      seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+      var t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  }
+  function el(name, attrs) {
+    var e = document.createElementNS(NS, name);
+    for (var k in attrs) { if (attrs.hasOwnProperty(k)) e.setAttribute(k, attrs[k]); }
+    return e;
+  }
+  function n(v) { return Math.round(v * 10) / 10; }
+  function wobble(r, a) { return (r() - 0.5) * 2 * a; }
+
+  function linePath(r, x1, y1, x2, y2, amp) {
+    var a = amp === undefined ? 1.3 : amp;
+    var sx = x1 + wobble(r, a), sy = y1 + wobble(r, a);
+    var ex = x2 + wobble(r, a), ey = y2 + wobble(r, a);
+    var c1x = x1 + (x2 - x1) * 0.32 + wobble(r, a * 2.2), c1y = y1 + (y2 - y1) * 0.32 + wobble(r, a * 2.2);
+    var c2x = x1 + (x2 - x1) * 0.68 + wobble(r, a * 2.2), c2y = y1 + (y2 - y1) * 0.68 + wobble(r, a * 2.2);
+    return 'M' + n(sx) + ',' + n(sy) + ' C' + n(c1x) + ',' + n(c1y) + ' ' + n(c2x) + ',' + n(c2y) + ' ' + n(ex) + ',' + n(ey);
+  }
+  function stroke(parent, r, x1, y1, x2, y2, o) {
+    o = o || {};
+    var passes = o.passes || 2;
+    for (var i = 0; i < passes; i++) {
+      parent.appendChild(el('path', {
+        d: linePath(r, x1, y1, x2, y2, o.amp),
+        fill: 'none',
+        stroke: o.color || 'var(--ink)',
+        'stroke-width': o.width || 1.6,
+        'stroke-linecap': 'round',
+        opacity: i ? 0.65 : 1
+      }));
+    }
+  }
+  function box(parent, r, x, y, w, h, o) {
+    stroke(parent, r, x, y, x + w, y, o);
+    stroke(parent, r, x + w, y, x + w, y + h, o);
+    stroke(parent, r, x + w, y + h, x, y + h, o);
+    stroke(parent, r, x, y + h, x, y, o);
+  }
+  function ovalPath(r, cx, cy, rx, ry, amp, start) {
+    var pts = [], i, steps = 18;
+    for (i = 0; i <= steps; i++) {
+      var ang = (i / steps) * Math.PI * 2 + start;
+      pts.push([cx + Math.cos(ang) * (rx + wobble(r, amp)), cy + Math.sin(ang) * (ry + wobble(r, amp))]);
+    }
+    var d = 'M' + n(pts[0][0]) + ',' + n(pts[0][1]);
+    for (i = 1; i < pts.length - 1; i++) {
+      var mx = (pts[i][0] + pts[i + 1][0]) / 2, my = (pts[i][1] + pts[i + 1][1]) / 2;
+      d += ' Q' + n(pts[i][0]) + ',' + n(pts[i][1]) + ' ' + n(mx) + ',' + n(my);
+    }
+    return d + ' T' + n(pts[pts.length - 1][0]) + ',' + n(pts[pts.length - 1][1]);
+  }
+  function oval(parent, r, cx, cy, rx, ry, o) {
+    o = o || {};
+    var passes = o.passes || 2;
+    for (var i = 0; i < passes; i++) {
+      parent.appendChild(el('path', {
+        d: ovalPath(r, cx, cy, rx, ry, o.amp === undefined ? 1.4 : o.amp, i * 0.6),
+        fill: 'none',
+        stroke: o.color || 'var(--ink)',
+        'stroke-width': o.width || 1.6,
+        'stroke-linecap': 'round',
+        opacity: i ? 0.7 : 1
+      }));
+    }
+  }
+  var clipId = 0;
+  function hachure(parent, r, x, y, w, h, o) {
+    if (w < 2) return;
+    o = o || {};
+    var step = o.step || 7, id = 'hx' + (++clipId);
+    var cp = el('clipPath', { id: id });
+    cp.appendChild(el('rect', { x: x, y: y, width: w, height: h }));
+    parent.appendChild(cp);
+    var g = el('g', { 'clip-path': 'url(#' + id + ')' });
+    for (var c = -h; c < w + h; c += step) {
+      g.appendChild(el('path', {
+        d: linePath(r, x + c, y + h, x + c + h, y, 1),
+        fill: 'none',
+        stroke: o.color || 'var(--pen)',
+        'stroke-width': o.width || 1.2,
+        'stroke-linecap': 'round',
+        opacity: o.opacity || 0.85
+      }));
+    }
+    parent.appendChild(g);
+  }
+  function arrow(parent, r, x1, y1, x2, y2, o) {
+    o = o || {};
+    stroke(parent, r, x1, y1, x2, y2, { color: o.color, width: o.width || 1.6, passes: 1, amp: 2.2 });
+    var ang = Math.atan2(y2 - y1, x2 - x1), len = o.head || 10;
+    stroke(parent, r, x2, y2, x2 - Math.cos(ang - 0.42) * len, y2 - Math.sin(ang - 0.42) * len, { color: o.color, width: o.width || 1.6, passes: 1, amp: 0.8 });
+    stroke(parent, r, x2, y2, x2 - Math.cos(ang + 0.42) * len, y2 - Math.sin(ang + 0.42) * len, { color: o.color, width: o.width || 1.6, passes: 1, amp: 0.8 });
+  }
+  function text(parent, x, y, str, cls, extra) {
+    var t = el('text', { x: n(x), y: n(y), 'class': cls });
+    if (extra) { for (var k in extra) { if (extra.hasOwnProperty(k)) t.setAttribute(k, extra[k]); } }
+    t.textContent = str;
+    return parent.appendChild(t), t;
+  }
+
+  /* ---------- the bar chart ---------- */
+  function drawBars() {
+    var host = document.getElementById('barCanvas');
+    if (!host) return;
+    var W = Math.round(host.clientWidth);
+    if (!W) return;
+    var rows = Array.prototype.slice.call(document.querySelectorAll('#barData tr'));
+    if (!rows.length) return;
+
+    var r = seeded(20220461);
+    var left = 3, valueRoom = W < 380 ? 78 : 92;
+    var maxW = Math.max(90, W - left - valueRoom);
+    var scaleMax = 12.4;
+    var rowH = 74, top = 16, barH = 27;
+    var H = top + rows.length * rowH + 46;
+
+    var svg = el('svg', { width: W, height: H, viewBox: '0 0 ' + W + ' ' + H, 'class': 'sk' });
+    svg.setAttribute('aria-hidden', 'true');
+    svg.setAttribute('focusable', 'false');
+
+    var lastBar = null, bestVal = null;
+    rows.forEach(function (tr, i) {
+      var name = tr.querySelector('th').textContent;
+      var value = tr.querySelector('td').textContent;
+      var w = parseFloat(tr.getAttribute('data-w')) / scaleMax * maxW;
+      var best = tr.getAttribute('data-best') === '1';
+      var y = top + i * rowH + 20;
+      text(svg, left + 2, y - 9, name, 'lbl');
+      hachure(svg, r, left, y, w, barH, { step: best ? 5 : 8, width: best ? 1.5 : 1.1, opacity: best ? 0.95 : 0.7 });
+      box(svg, r, left, y, w, barH, { width: 1.7, color: 'var(--ink)' });
+      var v = text(svg, left + w + 11, y + barH - 5, value, 'hw');
+      if (best) { lastBar = { y: y, w: w }; bestVal = v; }
+    });
+
+    stroke(svg, r, left, top + 4, left, top + rows.length * rowH - 6, { width: 1.5, color: 'var(--ink)', amp: 1.6 });
+
+    host.innerHTML = '';
+    host.appendChild(svg);
+
+    if (lastBar) {
+      var right = left + lastBar.w + valueRoom;
+      try {
+        var bb = bestVal.getBBox();
+        if (bb && bb.width) right = bb.x + bb.width + 14;
+      } catch (e) { /* getBBox can throw before layout; the estimate stands */ }
+      var x0 = left - 14, x1 = Math.min(W - 1, right);
+      var cx = (x0 + x1) / 2, cy = lastBar.y + barH / 2;
+      oval(svg, r, cx, cy, (x1 - x0) / 2, 26, { color: 'var(--red)', width: 1.9, amp: 2.2, passes: 2 });
+      text(svg, left + 4, H - 8, 'best they got', 'rw');
+      arrow(svg, r, left + 116, H - 18, left + 152, H - 42, { color: 'var(--red)', width: 1.7 });
+    }
+  }
+
+  /* ---------- the 100-dot grid ---------- */
+  function drawDots() {
+    var host = document.getElementById('dotCanvas');
+    if (!host) return;
+    var W = Math.round(host.clientWidth);
+    if (!W) return;
+
+    var r = seeded(1140);
+    var cell = Math.max(18, Math.min(29, Math.floor((Math.min(W, 320) - 8) / 10)));
+    var pad = 5, gridW = cell * 10;
+    var H = pad + cell * 10 + 62;
+    var svg = el('svg', { width: W, height: H, viewBox: '0 0 ' + W + ' ' + H, 'class': 'sk' });
+    svg.setAttribute('aria-hidden', 'true');
+    svg.setAttribute('focusable', 'false');
+
+    for (var i = 0; i < 100; i++) {
+      var cx = pad + (i % 10) * cell + cell / 2;
+      var cy = pad + Math.floor(i / 10) * cell + cell / 2;
+      var rad = cell * 0.33;
+      var hit = i < 11;
+      oval(svg, r, cx, cy, rad, rad, {
+        color: hit ? 'var(--pen)' : 'var(--ink)',
+        width: hit ? 1.5 : 1.1,
+        amp: 0.9,
+        passes: 1
+      });
+      if (hit) {
+        for (var s = 0; s < 4; s++) {
+          var t0 = -rad + (s * rad * 2) / 4;
+          stroke(svg, r, cx + t0, cy - rad * 0.85, cx + t0 + rad * 0.9, cy + rad * 0.85,
+            { color: 'var(--pen)', width: 1.5, passes: 1, amp: 0.7 });
+        }
+      }
+    }
+    var noteY = pad + cell * 10 + 34;
+    text(svg, 2, noteY, 'the other 89 are misses', 'rw');
+    arrow(svg, r, Math.min(gridW - 10, 170), noteY - 22, gridW - cell * 2.2, pad + cell * 9.1, { color: 'var(--red)', width: 1.7 });
+
+    host.innerHTML = '';
+    host.appendChild(svg);
+  }
+
+  var raf = null;
+  function draw() {
+    if (raf) cancelAnimationFrame(raf);
+    raf = requestAnimationFrame(function () { drawBars(); drawDots(); });
+  }
+
+  var t = null;
+  window.addEventListener('resize', function () {
+    clearTimeout(t);
+    t = setTimeout(draw, 180);
+  });
+  window.addEventListener('hashchange', show);
+  show();
+  if (document.fonts && document.fonts.ready && typeof document.fonts.ready.then === 'function') {
+    document.fonts.ready.then(draw).catch(function () {});
+  }
+})();
+</script>
+</body>
+</html>
