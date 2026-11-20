@@ -61,9 +61,10 @@ export default function Sources() {
 
           <div className="cite">
             <p>
-              <b>About the images:</b> the portraits of Maya and Leo, the phone screens, and the clue diagrams were made
-              with AI (Claude) for this site. Maya, Leo and every video title are invented. There charts were made using
-              HTML, and CSS. no photos of real people. <a href="#ai-use">See how AI was used</a>.
+              <b>Made with AI:</b> the portraits of Maya and Leo, the phone screens, the clue diagrams,
+              the feed-view switch and some design details were made with AI (Claude) for this site. Maya, Leo and
+              every video title are invented. The charts were made using HTML and CSS. There are no photos of real
+              people. <a href="#ai-use">See how AI was used</a>.
             </p>
           </div>
         </div>

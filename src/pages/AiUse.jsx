@@ -6,7 +6,7 @@ const rows = [
   {
     label: "WHAT CLAUDE MADE",
     body: [
-      "The portraits of Maya and Leo, the phone screens, the clue diagrams, the feed-view switch, and also collaborated on some design accepts like the hilight on the title.",
+      "The portraits of Maya and Leo, the phone screens, the clue diagrams, the feed-view switch and some design details, such as the highlight on the title.",
     ],
   },
   {

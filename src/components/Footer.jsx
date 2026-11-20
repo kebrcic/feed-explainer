@@ -18,7 +18,8 @@ export default function Footer() {
           social media or video app.
         </p>
         <p>
-          <b>Images:</b> the portraits, and phone screens were made with AI (Claude).
+          <b>Made with AI (Claude):</b> the portraits, the phone screens, the clue diagrams,
+          the feed-view switch and some design details.
         </p>
       </div>
     </footer>
