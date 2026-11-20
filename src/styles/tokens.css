@@ -14,8 +14,6 @@
   --pen: #2b4aa0;
   --red: #bf3a2b;
   --hl: #ffd84d;
-  --tape: #efe0b8;
-  --tape-edge: rgba(150, 131, 88, 0.4);
 
   --maya: #d8532a;
   --maya-soft: #fbe2d5;
@@ -30,7 +28,6 @@
   --print-ink: #46443f;
 
   --serif: 'Source Serif 4', Georgia, 'Times New Roman', serif;
-  --hand: 'Caveat', 'Segoe Script', cursive;
   --mono: 'Courier Prime', ui-monospace, 'Courier New', monospace;
 
   --measure: 62ch;
@@ -112,12 +109,6 @@ p {
   line-height: 1.58;
 }
 
-.hand {
-  font-family: var(--hand);
-  font-weight: 600;
-  line-height: 1.2;
-}
-
 .mono {
   font-family: var(--mono);
 }
@@ -163,24 +154,6 @@ table.vh caption {
   opacity: 0.085;
   mix-blend-mode: multiply;
   z-index: 40;
-}
-
-/* a strip of masking tape */
-.tape {
-  position: absolute;
-  display: block;
-  width: 84px;
-  height: 24px;
-  background: var(--tape);
-  opacity: 0.9;
-  border-left: 1px solid var(--tape-edge);
-  border-right: 1px solid var(--tape-edge);
-  clip-path: polygon(
-    0% 6%, 8% 0%, 22% 7%, 40% 1%, 58% 8%, 76% 2%, 92% 9%, 100% 4%,
-    98% 96%, 84% 100%, 66% 93%, 48% 100%, 30% 92%, 14% 99%, 2% 94%
-  );
-  pointer-events: none;
-  z-index: 3;
 }
 
 /* highlighter, drawn as two uneven marker strokes */

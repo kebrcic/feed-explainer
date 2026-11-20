@@ -38,7 +38,7 @@ export default function AiUse() {
     <>
       <header className="band page-head">
         <div className="sheet">
-          <a className="back hand pen" href="#home">
+          <a className="back pen" href="#home">
             ← back to the main page
           </a>
           <h1>How AI was used</h1>

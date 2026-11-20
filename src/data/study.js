@@ -55,7 +55,7 @@ export const watched = [
 export const people = {
   maya: {
     name: 'Maya',
-    reason: 'learning to cook. wants new recipes every week',
+    reason: 'Learning to cook. Wants new recipes every week.',
     feedView: 'watched 3 cooking videos.',
     // Drop a file in public/images/ and put its path here to use a picture
     // instead of the drawn portrait.
@@ -64,7 +64,7 @@ export const people = {
   },
   leo: {
     name: 'Leo',
-    reason: 'just needs one good dish for Saturday’s dinner party',
+    reason: 'Just needs one good dish for Saturday’s dinner party.',
     feedView: 'watched 3 cooking videos.',
     image: null,
     alt: 'Illustrated portrait of Leo, wearing glasses and holding a printed dinner party invitation',

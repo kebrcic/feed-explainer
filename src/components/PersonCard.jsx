@@ -9,7 +9,6 @@ export default function PersonCard({ who, person, feedView, side }) {
   return (
     <figure className={`person person-${side}`}>
       <div className="snap">
-        <span className="tape" aria-hidden="true" />
         {person.image ? (
           <img src={person.image} alt={person.alt} />
         ) : (

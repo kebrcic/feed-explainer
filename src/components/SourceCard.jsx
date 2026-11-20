@@ -7,7 +7,7 @@ export default function SourceCard({ compact = false }) {
       <p className="source-kicker mono">where this number comes from</p>
       <p className="source-title">“{study.title}”</p>
       <p className="source-meta">
-        {study.authorsShort} · <i>{study.journal}</i>, vol. {study.volume}, pp. {study.pages},{' '}
+        {study.authorsShort} · {study.journal}, vol. {study.volume}, pp. {study.pages},{' '}
         {study.year} · {study.table}
       </p>
       <p className="source-links">

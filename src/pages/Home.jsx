@@ -37,11 +37,11 @@ export default function Home() {
             </div>
 
             <div className="duo-note" aria-hidden="true">
-              <span className="hand">same 3 videos!!</span>
-              <svg viewBox="0 0 40 72" width="30" height="54" className="duo-arrow">
-                <g fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
-                  <path d="M21 4 C14 18 25 30 18 44 C15 52 18 58 19 65" />
-                  <path d="M12 55 C15 60 18 64 19 67 C21 62 24 58 28 54" />
+              <span className="margin-note">same 3 videos!!</span>
+              <svg viewBox="0 0 24 56" width="22" height="52" className="duo-arrow">
+                <g fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round">
+                  <path d="M12 2 V50" />
+                  <path d="M5 43 L12 52 L19 43" />
                 </g>
               </svg>
             </div>
@@ -55,12 +55,12 @@ export default function Home() {
           <p className="hero-cap" aria-live="polite">
             {feedView
               ? 'This is the whole file: two identical histories, and no reason behind either one.'
-              : 'The two screens match. Everything in blue pen is the part your feed never gets to see.'}
+              : 'The two screens match. What is written under their names is the part your feed never gets to see.'}
           </p>
         </div>
       </header>
 
-      <section className="band ruled">
+      <section className="band">
         <div className="sheet">
           <h2>Would more history help it tell them apart?</h2>
           <p>Feeds work from two kinds of clues. Here is what each one picks up on Maya and Leo.</p>
@@ -73,7 +73,7 @@ export default function Home() {
                 Both of them opened the same videos in the same order, so this clue hands the feed
                 one history and it makes one guess for both of them.
               </p>
-              <p className="verdict hand pen">same history → same guess</p>
+              <p className="verdict">same history → same guess</p>
             </div>
             <ClueStrip
               label="Maya and Leo each watched the same three videos, and the feed guesses meal prep next for both of them."
@@ -93,7 +93,7 @@ export default function Home() {
                 after Saturday has come and gone, and even then the feed sees what they did, never
                 why they did it.
               </p>
-              <p className="verdict hand pen">different now, still no “why”</p>
+              <p className="verdict">different now, still no “why”</p>
             </div>
             <ClueStrip
               label="A week later, Maya watches a bread video and Leo watches basketball highlights."
@@ -110,7 +110,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="band tinted results">
+      <section className="band results">
         <div className="sheet">
           <h2>So how often do those clues guess right?</h2>
           <p className="lede">
@@ -139,26 +139,24 @@ export default function Home() {
 
           <div className="sunday">
             <div className="note note-maya">
-              <span className="tape" aria-hidden="true" />
               <span className="note-face">
                 <MayaPortrait />
               </span>
-              <span className="day hand">Sunday</span>
+              <span className="day">Sunday</span>
               <p>Maya is picking out next week’s recipes. Her feed got her right.</p>
             </div>
             <div className="note note-leo">
-              <span className="tape" aria-hidden="true" />
               <span className="note-face">
                 <LeoPortrait />
               </span>
-              <span className="day hand">Sunday</span>
+              <span className="day">Sunday</span>
               <p>Leo’s party is over. His feed is still all recipes.</p>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="band tinted why">
+      <section className="band why">
         <div className="sheet">
           <h3>Why this matters for you</h3>
           <p>Your feed can’t tell a phase from a passion. All of these look the same from the outside:</p>
@@ -172,7 +170,7 @@ export default function Home() {
             <span className="hl">“Not interested”</span> option tucked into the menu on a post, and
             it tells your feed something your clicks can’t.
           </p>
-          <p className="ni-note hand pen">worth the two seconds</p>
+          <p className="ni-note">Worth the two seconds.</p>
         </div>
       </section>
     </>

@@ -26,7 +26,7 @@ export default function BarChart() {
               style={{ '--w': `${(r.value / SCALE_MAX) * 100}%` }}
             >
               <span className="bar" style={{ background: r.color }} />
-              <span className="bar-value hand">{r.display}</span>
+              <span className="bar-value">{r.display}</span>
               {r.best && (
                 <svg className="circle-mark" viewBox="0 0 400 70" preserveAspectRatio="none" aria-hidden="true">
                   <path
@@ -43,7 +43,7 @@ export default function BarChart() {
         ))}
       </div>
 
-      <p className="chart-note hand redpen">best of the three</p>
+      <p className="chart-note redpen">best of the three</p>
 
       <table className="vh">
         <caption>Share of one-article guesses that matched the reader’s next click</caption>

@@ -2,7 +2,6 @@
 export default function ClueStrip({ rows, label }) {
   return (
     <div className="strip" role="img" aria-label={label}>
-      <span className="tape strip-tape" aria-hidden="true" />
       {rows.map((row) => (
         <div className="strip-row" key={row.who}>
           <span className={`strip-who mono who-${row.who.toLowerCase()}`}>{row.who}</span>

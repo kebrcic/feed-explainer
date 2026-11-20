@@ -5,7 +5,7 @@ export default function Sources() {
     <>
       <header className="band page-head">
         <div className="sheet">
-          <a className="back hand pen" href="#home">
+          <a className="back pen" href="#home">
             ← back to the main page
           </a>
           <h1>Where the numbers come from</h1>
@@ -21,7 +21,7 @@ export default function Sources() {
             <div>
               <h3>The study</h3>
               <p>
-                Four researchers published it in {study.year} in the <i>{study.journal}</i>, which
+                Four researchers published it in {study.year} in the {study.journal}, which
                 is peer reviewed, so other experts checked the work before it was published. They
                 used reading records from three news websites. The main page uses one of them, an{' '}
                 {study.dataset}.
@@ -56,9 +56,8 @@ export default function Sources() {
           </div>
 
           <div className="cite">
-            <span className="tape" aria-hidden="true" />
             <p>
-              <b>Full citation:</b> {study.authorsFull}, “{study.title},” <i>{study.journal}</i>,
+              <b>Full citation:</b> {study.authorsFull}, “{study.title},” {study.journal},
               vol. {study.volume}, pp. {study.pages}, {study.year}. Chart values from {study.table}.
             </p>
             <p>

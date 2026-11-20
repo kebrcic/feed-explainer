@@ -5,7 +5,7 @@ const dots = Array.from({ length: 100 }, (_, i) => i < bestOutOf100.hits)
 export default function DotGrid() {
   return (
     <div className="waffle">
-      <p className="score hand">
+      <p className="score">
         {bestOutOf100.hits} right,
         <br />
         {bestOutOf100.misses} missed
@@ -19,7 +19,7 @@ export default function DotGrid() {
           <span key={i} className={hit ? 'dot hit' : 'dot'} />
         ))}
       </div>
-      <p className="dots-note hand redpen">↑ the other {bestOutOf100.misses} are misses</p>
+      <p className="dots-note redpen">↑ the other {bestOutOf100.misses} are misses</p>
       <p className="dots-cap mono">the best of the three, per 100 guesses</p>
     </div>
   )

@@ -1,7 +1,7 @@
 import { watched } from '../data/study.js'
 
 // Everything the feed can see, drawn as a printed screenshot: grey, square,
-// typewriter type. The opposite of the handwriting around it.
+// typewriter type, set against the warm serif the people get.
 export default function PhoneScreen() {
   const label =
     'Phone screenshot. Watched this week: ' +
@@ -9,7 +9,6 @@ export default function PhoneScreen() {
 
   return (
     <div className="screen" role="img" aria-label={label}>
-      <span className="tape screen-tape" aria-hidden="true" />
       <p className="screen-head">watched this week</p>
       <ul className="screen-list">
         {watched.map((v) => (
