@@ -1,10 +1,17 @@
-# local working material, submitted separately — never publish
-authors-note-material.md
-Project_3_Infographic_Context.pdf
+# ---- coursework: submitted separately, never publish ----
+# the Author's Note, in any form
+authors-note*
+Authors-Note*
+*Author*Note*
+# the built submission bundle (note PDF + website backup PDF)
+submission/
+# the draft infographic and any other PDFs dropped at the repo root
+/*.pdf
+
+# ---- local only ----
 review-screenshots/
 
-# build + tooling
+# ---- build + tooling ----
 node_modules/
 dist/
 .DS_Store
-submission/
