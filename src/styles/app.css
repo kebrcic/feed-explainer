@@ -317,12 +317,33 @@
 .strip-row {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
   margin-bottom: 24px;
 }
 
 .strip-row:last-child {
   margin-bottom: 14px;
+}
+
+.strip-face {
+  width: 30px;
+  height: 30px;
+  flex: none;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 1.5px solid var(--maya);
+  background: #fff;
+}
+
+.strip-face.face-leo {
+  border-color: var(--leo);
+}
+
+.strip-face svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  transform: scale(1.2) translateY(4%);
 }
 
 .strip-who {
@@ -881,8 +902,13 @@
   }
 
   .strip-who {
-    width: 38px;
+    width: 34px;
     font-size: 11px;
+  }
+
+  .strip-face {
+    width: 24px;
+    height: 24px;
   }
 
   .strip-gap {
